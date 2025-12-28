@@ -22,6 +22,7 @@ useEffect(() => {
 if (!user) return <p>Cargando...</p>;
 
 
+
   // 🎭 Elegir avatar predefinido
  const elegirAvatar = async (avatarName) => {
   const token = localStorage.getItem("token");
