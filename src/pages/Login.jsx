@@ -24,21 +24,17 @@ const handleLogin = async (e) => {
     const data = await response.json();
 
     if (!response.ok) {
-      alert(data.msg); // correo no registrado o contraseña incorrecta
+      alert(data.msg);
       return;
     }
 
-    // Guardar usuario logueado en localStorage
     localStorage.setItem("usuario_actual", JSON.stringify(data.user));
-
-    // Redirigir a perfil
     navigate("/perfil");
   } catch (err) {
     console.error("Error en login:", err);
     alert("Error al iniciar sesión");
   }
 };
-
 
 
 
