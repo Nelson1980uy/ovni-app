@@ -11,66 +11,79 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();              // 🔥 limpia contexto + localStorage
-    navigate("/login");    // redirige
-  };
+  logout();                          // elimina usuario_actual y limpia el contexto
+  localStorage.removeItem("usuario_actual"); // asegura que App.jsx vea que no hay usuario
+  setOpen(false);                    // cierra el menú si estaba abierto
+  navigate("/");                     // redirige a Home
+};
+
+
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const avatarSrc =
+    user?.avatar && user.avatar.startsWith("/uploads")
+      ? `${API_URL}${user.avatar}`
+      : `/avatars/${user?.avatar || "alien1.jpg"}`;
 
   return (
     <nav className="navbar">
+      {/* Logo */}
       <div className="nav-logo">LA SEÑAL</div>
 
-      <button onClick={toggleTheme} className="theme-button">
-        {theme === "dark" ? "☀️ Claro" : "🌙 Oscuro"}
-      </button>
-
+      {/* Botón hamburguesa solo visible en móvil */}
       <button
-        className={`hamburger ${open ? "open" : ""}`}
+        className="hamburger-wrapper flex flex-col items-center bg-transparent border-none serpentin md:hidden"
         onClick={() => setOpen(!open)}
-        aria-label="Abrir menú"
+        aria-label={open ? "Cerrar menú" : "Abrir menú"}
         aria-expanded={open}
       >
-        <span />
-        <span />
-        <span />
+        <div className={`hamburger ${open ? "open" : ""}`}>
+          <span />
+          <span />
+          <span />
+        </div>
+        <span className="btn-signal mt-1 serpentin-texz">{open ? "Cerrar" : "Menu"}</span>
       </button>
 
+      {/* Links y botones del menú */}
       <div className={`nav-links ${open ? "show" : ""}`}>
-        {/* 🔓 USUARIO NO LOGUEADO */}
-        {!user && (
-          <>
-            <Link to="/" onClick={() => setOpen(false)}>INICIO</Link>
-            <Link to="/login" onClick={() => setOpen(false)}>LOGIN</Link>
-          </>
-        )}
+  <button className="serpentin" onClick={() => { setOpen(false); navigate("/usuarios"); }}>
+    USUARIOS REGISTRADOS
+  </button>
 
-        {/* 🔒 USUARIO LOGUEADO */}
-        {user && (
-          <>
-            <Link to="/archivo" onClick={() => setOpen(false)}>ARCHIVOS</Link>
-            <Link to="/avistamientos" onClick={() => setOpen(false)}>AVISTAMIENTOS</Link>
-            <Link to="/perfil" onClick={() => setOpen(false)}>PERFIL</Link>
+  <Link className="serpentin" to="/senal-entrante" onClick={() => setOpen(false)}>
+    SEÑAL ENTRANTE
+  </Link>
 
-            {/* 👽 USUARIO + AVATAR */}
-            <div className="nav-user">
-              <img
-                src={`/avatars/${user.avatar || "alien1.png"}`}
-                alt="Avatar"
-                width={36}
-                className="nav-avatar"
-              />
-              <button
-                className="logout-btn"
-                onClick={() => {
-                  setOpen(false);
-                  handleLogout();
-                }}
-              >
-                SALIR
-              </button>
-            </div>
-          </>
-        )}
-      </div>
+  <Link className="serpentin" to="/archivo" onClick={() => setOpen(false)}>
+    ARCHIVOS
+  </Link>
+
+  <Link className="serpentin" to="/avistamientos" onClick={() => setOpen(false)}>
+    AVISTAMIENTOS
+  </Link>
+
+  <Link className="serpentin" to="/perfil" onClick={() => setOpen(false)}>
+    PERFIL
+  </Link>
+
+  {user && ( 
+  <div className="nav-user">
+    {/* Contenedor serpentin del avatar */}
+    <div className="avatar-serpentin">
+      <img src={avatarSrc} alt="Avatar" className="nav-avatar avatar-actual" />
+      {/* Borde animado serpentin */}
+      <div className="serpentin-border" />
+    </div>
+
+    <button className="serpentin" onClick={() => { setOpen(false); handleLogout(); }}>
+      SALIR
+    </button>
+  </div>
+)}
+
+</div>
+
     </nav>
   );
 }

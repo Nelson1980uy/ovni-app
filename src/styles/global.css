@@ -18,8 +18,19 @@
   --glow-signal: 0 0 25px rgba(0,240,255,0.35);
 }
 
+html {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  html { font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 12px; }
+}
 /* =========================
-   BASE
+   BASE RESPONSIVA
 ========================= */
 body, html {
   height: 100%;
@@ -27,15 +38,15 @@ body, html {
   font-family: "Inter", sans-serif;
   background: radial-gradient(circle at top, #0b1220, #05070c);
   color: var(--text-main);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 #root {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column; /* importante para layout vertical */
 }
 
 /* =========================
@@ -49,6 +60,23 @@ body, html {
   text-align: center;
   margin-bottom: 1.5rem;
 }
+
+/* Texto con oro real brillante */
+.serpentin-gold-real {
+  background: linear-gradient(
+    45deg,
+    #FFD700,   /* Oro intenso */
+    #FFC300,   /* Amarillo dorado brillante */
+    #FFB700,   /* Destellos más cálidos */
+    #FFDA44    /* Luz reflejada */
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  font-weight: bold;
+  text-shadow: 0 0 4px rgba(255, 215, 0, 0.6); /* brillo extra */
+}
+
 
 .home-title { font-size: clamp(2.5rem, 6vw, 4rem); letter-spacing: 0.15em; }
 .login-title { font-size: clamp(2rem, 5vw, 3rem); }
@@ -107,9 +135,10 @@ body, html {
 button.btn-signal {
   width: 100%;
   max-width: 400px;
-  padding: 0.8rem 1rem;
+  height: 50px;
+  padding: 0.75rem 1.5rem;   /* alto y ancho del botón */       
   font-size: 1rem;
-  border-radius: 30px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
   background-color: var(--signal-primary);
@@ -122,44 +151,79 @@ button.btn-signal {
   margin: 0 auto;
 }
 
-button.btn-signal:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 40px rgba(0,240,255,0.6);
+
+
+
+
+.radar-bg {
+  position: absolute;
+  inset: -20%;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(0,240,255,0.18) 0%,
+      rgba(0,240,255,0.10) 30%,
+      rgba(0,240,255,0.04) 55%,
+      rgba(0,0,0,0.95) 75%
+    );
+  mask-image: radial-gradient(circle, rgba(0,0,0,1) 55%, rgba(0,0,0,0.75) 65%, rgba(0,0,0,0.3) 75%, rgba(0,0,0,0) 85%);
+  -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 55%, rgba(0,0,0,0.75) 65%, rgba(0,0,0,0.3) 75%, rgba(0,0,0,0) 85%);
+  overflow: hidden;
 }
 
-/* =========================
-   RADAR
-========================= */
-.radar-circle {
+.radar-bg::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(0,240,255,0.35) 18deg, rgba(0,240,255,0.18) 30deg, transparent 60deg);
+  animation: radarSweep 12s linear infinite;
+  filter: blur(2px);
+  opacity: 0.75;
+}
+
+.radar-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-radial-gradient(circle, rgba(0,240,255,0.15) 0px, rgba(0,240,255,0.15) 1px, transparent 36px);
+  opacity: 0.3;
+  mask-image: radial-gradient(circle, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 85%);
+  -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 85%);
+}
+
+.radar-pulse::before {
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 500px;
-  height: 500px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: radial-gradient(rgba(0,240,255,0.05), transparent 70%);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 0;
+  border: 2px solid rgba(0,240,255,0.6);
+  transform: translate(-50%, -50%) scale(0);
+  animation: radarPulse 3s ease-out infinite;
+  box-shadow: 0 0 25px rgba(0,240,255,0.5), 0 0 70px rgba(0,240,255,0.3);
 }
 
-.radar-circle::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: linear-gradient(to right, rgba(0,240,255,0.15) 0%, rgba(0,240,255,0) 70%);
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%) rotate(0deg);
-  transform-origin: center;
-  animation: radar-sweep 4s linear infinite;
+@keyframes radarSweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-@keyframes radar-sweep {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
+@keyframes radarPulse {
+  0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.9; }
+  65% { opacity: 0.45; }
+  100% { transform: translate(-50%, -50%) scale(48); opacity: 0; }
 }
+
+/* Opcional: color rojo si quieres marcar coincidencias */
+.radar-bg.activo .radar-pulse::before {
+  border-color: rgba(255, 60, 60, 0.7);
+  box-shadow: 0 0 30px rgba(255, 60, 60, 0.6), 0 0 90px rgba(255, 0, 0, 0.4);
+}
+
 
 /* =========================
    REGISTRO / AGUJERO DE GUSANO
@@ -209,13 +273,14 @@ button.btn-signal:hover {
 
 .avatar-card img {
   border-radius: 50%;
-  border: 2px solid #00f0ff;
+  
 }
 
 .nav-user {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  
 }
 
 .nav-avatar {
@@ -223,6 +288,790 @@ button.btn-signal:hover {
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid cyan;
+  
 }
+
+
+/*Modal terminos*/
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+/* Modal términos */
+.modal-cartel {
+  position: relative;
+  max-width: 600px; /* Aumenta el max-width para hacerlo más ancho */
+  width: 100%;
+  padding: 40px; /* Aumenta el padding para dar más espacio dentro del modal */
+  background: radial-gradient(circle at top, #0b1d26, #000);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.25);
+  animation: fadeInScale 0.4s ease-out;
+  z-index: 100000;
+}
+
+/* TEXTO SCROLL */
+.modal-text {
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 20px 0;
+  line-height: 1.6;
+  color: #d1d5db;
+}
+
+/* CHECK */
+.modal-check {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Un poco más de espacio entre el checkbox y el texto */
+  margin-bottom: 25px;
+  color: #e5e7eb;
+}
+
+/* ANIMACIÓN */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.85); /* Puedes ajustar el tamaño de entrada */
+  }
+  to {
+    opacity: 1;
+    transform: scale(1); /* Mantén el tamaño original al final */
+  }
+}
+
+.hidden {
+  pointer-events: none;
+  filter: blur(4px);
+}
+
+/* TEXTO SCROLL */
+.modal-text {
+  max-height: 400px; /* Aumenta la altura máxima si tienes mucho contenido */
+  overflow-y: auto;
+  margin: 20px 0;
+  line-height: 1.8; /* Aumenta el interlineado para que sea más legible */
+  color: #d1d5db;
+}
+
+.modal-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-text::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 0, 0.4);
+  border-radius: 10px;
+}
+
+
+
+
+
+.btn-signal2 {
+  width: 40px;               /* ancho del botón */
+  height: 25px;              /* alto del botón */
+  font-size: 12px;           /* tamaño de texto */
+  font-family: "Orbitron", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;              /* texto negro (o el que uses en botones) */
+  border-radius: 0.25rem;    /* bordes redondeados */
+  border: none;              /* sin borde extra */
+  cursor: pointer;
+  transition: none;           /* sin transición de color */
+  padding: 0.75rem 1.5rem;   /* alto y ancho del botón */  
+}
+
+
+
+
+
+
+
+/* NAVBAR LINKS - DESKTOP */
+.nav-links {
+  display: flex;
+  flex-direction: row;   /* fila por defecto */
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ===========================
+   RESPONSIVE: MÓVIL
+=========================== */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;      /* oculto hasta que se abra */
+    flex-direction: column;
+    align-items: flex-start; /* links alineados a la izquierda */
+    position: absolute;
+    top: 60px;          /* debajo del navbar */
+    left: 0;            /* alineado a la izquierda */
+    width: 100%;        /* ocupa todo el ancho */
+    background-color: rgba(0, 0, 0, 0.95); /* semi-transparente opcional */
+    padding: 1rem;
+    border-radius: 0 0 12px 12px;
+    z-index: 999;       /* sobre contenido */
+    gap: 1rem;          /* margen entre links */
+  }
+
+  /* Cuando hamburguesa está abierto */
+  .nav-links.show {
+    display: flex;
+  }
+
+  /* Avatar + botón SALIR en columna alineados a la izquierda */
+  .nav-user {
+    flex-direction: row;     /* horizontal dentro de columna */
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  /* Ajuste botones links */
+  .nav-links > a,
+  .nav-links > button {
+    width: 100%;             /* que ocupen todo el ancho */
+    text-align: left;        /* texto alineado a la izquierda */
+  }
+}
+
+
+.btn-signal3 {
+  width: 40px;               /* ancho del botón */
+  height: 25px;              /* alto del botón */
+  font-size: 12px;
+  font-family: "Orbitron", sans-serif;
+  padding: 0.75rem 1.5rem;   /* alto y ancho del botón */         
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--signal-primary);
+  border-radius: 0.25rem;    /* bordes redondeados */
+  border: none;              /* sin borde extra */
+  cursor: pointer;
+  transition: none;           /* sin transición de color */
+}
+
+/* Efecto hover */
+.btn-signal3:hover {
+  transform: scale(1.05);    /* aumenta ligeramente */
+  background: linear-gradient(90deg, #00d0ff, #0044ff);
+}
+
+.btn-upload {
+  display: inline-block;
+  padding: 0.55rem 1rem;
+   background-color: var(--signal-primary);
+  color: black;
+  font-size: 12px;
+  font-family: "Orbitron", sans-serif;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-align: center;
+}
+
+.btn-upload:hover {
+  transform: scale(1.05);    /* aumenta ligeramente */
+  background: linear-gradient(90deg, #00d0ff, #0044ff);
+}
+
+
+.btn-signal4 {
+  width: 125px;          /* ancho ajustable */
+  height: 35px;          /* alto ajustable */
+  font-size: 12px;       /* tamaño de fuente */
+  font-family: "Orbitron", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--signal-primary);
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;  /* agrega transición suave */
+}
+
+.btn-signal4:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #00d0ff, #0044ff);
+}
+
+
+.nav-alert {
+  color: cyan;
+  font-weight: bold;
+  text-shadow: 0 0 6px rgba(0,255,255,0.6);
+  animation: pulseSignal 2s infinite;
+}
+
+@keyframes pulseSignal {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+
+select {
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: #000dff; /* azul sólido */
+  color: #fff;
+  font-weight: bold;
+  min-width: 200px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  appearance: none;
+}
+
+/* Para los navegadores que soportan */
+select option {
+  background: linear-gradient(90deg, #000dff, #1a3bff);
+
+  color: white; /* texto blanco */
+}
+
+
+/* ===== RADAR REALISTA DE FONDO ===== */
+.radar-bg {
+  position: absolute;
+  inset: -20%;              /* 👉 se agranda para que no se vean bordes */
+  z-index: 1;
+  pointer-events: none;
+
+  /* Fondo base */
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(0,240,255,0.18) 0%,
+      rgba(0,240,255,0.10) 30%,
+      rgba(0,240,255,0.04) 55%,
+      rgba(0,0,0,0.95) 75%
+    );
+
+  /* 🔑 máscara circular suave */
+  mask-image: radial-gradient(
+    circle,
+    rgba(0,0,0,1) 55%,
+    rgba(0,0,0,0.75) 65%,
+    rgba(0,0,0,0.3) 75%,
+    rgba(0,0,0,0) 85%
+  );
+
+  -webkit-mask-image: radial-gradient(
+    circle,
+    rgba(0,0,0,1) 55%,
+    rgba(0,0,0,0.75) 65%,
+    rgba(0,0,0,0.3) 75%,
+    rgba(0,0,0,0) 85%
+  );
+
+  overflow: hidden;
+}
+
+/* 🔄 Barrido del radar (sin corte) */
+.radar-bg::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(0,240,255,0.35) 18deg,
+    rgba(0,240,255,0.18) 30deg,
+    transparent 60deg
+  );
+
+  animation: radarSweep 12s linear infinite;
+  filter: blur(2px);
+  opacity: 0.75;
+}
+
+/* ⭕ Líneas circulares suaves */
+.radar-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-radial-gradient(
+      circle,
+      rgba(0,240,255,0.15) 0px,
+      rgba(0,240,255,0.15) 1px,
+      transparent 36px
+    );
+
+  opacity: 0.3;
+
+  /* mismo fade circular */
+  mask-image: radial-gradient(
+    circle,
+    rgba(0,0,0,1) 55%,
+    rgba(0,0,0,0) 85%
+  );
+
+  -webkit-mask-image: radial-gradient(
+    circle,
+    rgba(0,0,0,1) 55%,
+    rgba(0,0,0,0) 85%
+  );
+}
+
+/* Animación ultra fluida */
+@keyframes radarSweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/*Radar efecto busqueda*/
+.ping-activo::before {
+  content: "";
+  position: absolute;
+  inset: -20px;
+  border-radius: 20px;
+  border: 2px solid rgba(0,240,255,0.5);
+  animation: ping 1.5s infinite;
+}
+
+@keyframes ping {
+  0% { transform: scale(0.95); opacity: 1; }
+  100% { transform: scale(1.1); opacity: 0; }
+}
+
+
+/*Emitir Onda*/
+/* Pulso radial cuando hay coincidencias */
+.radar-pulse {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* RADAR FONDO */
+.radar-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+
+  background:
+    radial-gradient(circle at center,
+      rgba(0,240,255,0.12) 0%,
+      rgba(0,240,255,0.05) 30%,
+      rgba(0,0,0,0.95) 70%
+    );
+}
+
+/* PULSO RADAR (BASE AZUL) */
+.radar-pulse::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+
+  border: 2px solid rgba(0,240,255,0.6);
+  transform: translate(-50%, -50%) scale(0);
+
+  animation: radarPulse 3s ease-out infinite;
+
+  box-shadow:
+    0 0 25px rgba(0,240,255,0.5),
+    0 0 70px rgba(0,240,255,0.3);
+}
+
+
+@keyframes radarPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0.9;
+  }
+
+  65% {
+    opacity: 0.45;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(48);
+    opacity: 0;
+  }
+}
+
+
+.radar-bg.activo .radar-pulse::before {
+  border-color: rgba(255, 60, 60, 0.7);
+  box-shadow:
+    0 0 30px rgba(255, 60, 60, 0.6),
+    0 0 90px rgba(255, 0, 0, 0.4);
+}
+
+
+.radar-bg.match .radar-pulse::before {
+  animation-duration: 2.2s;
+  border-width: 3px;
+
+  box-shadow:
+    0 0 45px rgba(255, 80, 80, 0.9),
+    0 0 140px rgba(255, 0, 0, 0.6);
+}
+
+
+
+/*color oro en perfil*/
+
+.usuario-card-futurista.serpentin {
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0a0a2a, #000033);
+  overflow: hidden;
+}
+
+/* Borde serpenteante animado */
+.usuario-card-futurista.serpentin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px; /* grosor del borde */
+  border-radius: 16px;
+  background: linear-gradient(
+    90deg,
+    gold 0%,
+    transparent 50%,
+    gold 100%
+  );
+  background-size: 200% 200%;
+  z-index: 1;
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: destination-out;
+  animation: serpentinMove 3s linear infinite;
+}
+
+/* Mantener contenido por encima */
+.usuario-card-futurista.serpentin > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Animación del borde */
+@keyframes serpentinMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/*Serpentin en encontrar usuario*/
+/* Tarjeta con borde serpenteante */
+.lista-usuarios .usuario-tarjeta.serpentin {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Borde serpenteante animado */
+.lista-usuarios .usuario-tarjeta.serpentin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px; /* grosor del borde */
+  border-radius: 14px;
+  background: linear-gradient(90deg, gold 0%, transparent 50%, gold 100%);
+  background-size: 200% 200%;
+  z-index: 1;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: destination-out;
+  animation: serpentinMove 3s linear infinite;
+}
+
+/* Mantener contenido por encima */
+.lista-usuarios .usuario-tarjeta.serpentin > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Animación del borde */
+@keyframes serpentinMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/*Glogal serpentin en botones*/
+/* Botón con borde serpenteante */
+button.serpentin {
+  position: relative;
+  border: none; /* o tu borde normal */
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(135deg, #05051a, #000dff);
+  color: #00f0ff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+/* Borde serpenteante animado */
+button.serpentin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  padding: 2px; /* grosor del borde */
+  background: linear-gradient(90deg, gold 0%, transparent 50%, gold 100%);
+  background-size: 200% 200%;
+  z-index: 1;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: destination-out;
+  animation: serpentinMove 3s linear infinite;
+}
+
+/* Mantener contenido del botón por encima del borde */
+button.serpentin > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Animación del borde */
+@keyframes serpentinMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Hover opcional para resaltar */
+button.serpentin:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px gold, 0 0 30px rgba(255,215,0,0.4);
+}
+
+
+/*Glogal serpentin en link*/
+a.serpentin, 
+.Link.serpentin {
+  display: inline-block; /* necesario para padding y borde */
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(135deg, #05051a, #000dff);
+  color: #00f0ff;
+  font-weight: bold;
+  text-decoration: none; /* quitar subrayado */
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+/* Mantener contenido por encima del borde animado */
+a.serpentin > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* El borde animado */
+a.serpentin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  padding: 2px;
+  background: linear-gradient(90deg, gold 0%, transparent 50%, gold 100%);
+  background-size: 200% 200%;
+  z-index: 1;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: destination-out;
+  animation: serpentinMove 3s linear infinite;
+}
+
+/* Hover opcional */
+a.serpentin:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px gold, 0 0 30px rgba(255,215,0,0.4);
+}
+
+
+
+
+
+
+
+
+
+/*Avatar serpentin*/
+.avatar-serpentin {
+  position: relative;
+  border-radius: 50%;
+}
+
+.serpentin-border {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  border-radius: 50%;
+  border: 2px solid gold;
+  box-sizing: border-box;
+  animation: serpentin 2.5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes serpentin {
+  0% { border-color: gold; }
+  25% { border-color: orange; }
+  50% { border-color: gold; }
+  75% { border-color: orange; }
+  100% { border-color: gold; }
+}
+
+
+
+.avatar-actual {
+  border-radius: 50%;         /* círculo */
+  animation: serpentine 3s ease-in-out infinite;
+  transition: transform 0.2s;
+}
+
+/* Contenedor del botón */
+.volver-btn-container {
+  display: flex;
+  justify-content: flex-end; /* siempre a la derecha */
+  margin-top: 1.5rem; /* separación con contenido */
+  position: relative; /* para que no interfiera con otros elementos */
+  z-index: 2;
+}
+
+/* Botón */
+.volver-btn {
+  min-width: 130px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #00f0ff;
+  background: linear-gradient(135deg, #05051a, #000dff);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: box-shadow 0.3s ease, filter 0.3s ease;
+}
+
+/* Hover efecto serpentin */
+.volver-btn:hover {
+  box-shadow: 0 0 15px rgba(0,240,255,0.6);
+  filter: brightness(1.1);
+}
+
+/* ==============================
+   RESPONSIVE: mover abajo en pantallas pequeñas
+============================== */
+@media screen and (max-width: 768px) {
+  /* Asumimos que el contenedor padre es flex-col */
+  .volver-btn-container {
+    order: 999;             /* lo asegura al final */
+    width: 100%;
+    margin-top: 3rem;       /* separación suficiente desde el contenido */
+    justify-content: flex-end; /* siempre derecha */
+    padding: 0 1rem;        /* algo de margen lateral en móviles */
+  }
+
+  .volver-btn {
+    width: auto;            /* que no ocupe todo el ancho */
+    max-width: 150px;
+  }
+}
+
+.usuario-nombre {
+  margin: 0.4rem 0 0.8rem;
+  font-weight: bold;
+  font-size: 1rem;
+  text-align: center;  /* 🔹 centrado horizontal */
+}
+
+
+/*Img serpentin*/
+/* Contenedor para cualquier imagen con borde serpentin */
+.img-serpentin {
+  position: relative;
+  display: inline-block; /* para que el borde se ajuste al tamaño de la img */
+  border-radius: 50%;    /* si quieres circular */
+  overflow: visible;     /* para que el borde animado no se corte */
+}
+
+/* La imagen dentro del contenedor */
+.img-serpentin img {
+  display: block;
+  width: 80px;           /* tamaño por defecto */
+  height: 80px;
+  border-radius: 50%;    /* círculo */
+  object-fit: cover;
+  border: 2px solid cyan; /* borde base */
+  box-shadow: 0 0 12px cyan;
+}
+
+/* Borde animado serpentin */
+.img-serpentin::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  border-radius: 50%;
+  border: 2px solid gold;
+  box-sizing: border-box;
+  animation: serpentin 2.5s linear infinite;
+  pointer-events: none; /* no interfiere con clicks */
+  z-index: 2;
+}
+
+@keyframes serpentin {
+  0% { border-color: gold; }
+  25% { border-color: orange; }
+  50% { border-color: gold; }
+  75% { border-color: orange; }
+  100% { border-color: gold; }
+}
+
+
+/*No scroll paguina Usuario Publico*/
+.no-scroll {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: #0a0a2a;
+  overflow: hidden;
+}
+
+
+
+
 

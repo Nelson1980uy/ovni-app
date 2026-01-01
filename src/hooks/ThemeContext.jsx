@@ -1,4 +1,5 @@
-import { createContext, useState, useContext, useEffect } from "react";
+// context/AuthContext.js
+import { createContext, useContext, useState, useEffect } from "react";
 
 const ThemeContext = createContext();
 
@@ -26,4 +27,6 @@ export const ThemeProvider = ({ children }) => {
   );
 };
 
+// 🔑 Esto es imprescindible para que Navbar lo pueda importar
 export const useTheme = () => useContext(ThemeContext);
+

@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/modal.css";
+
+
 
 export default function Registro() {
   const navigate = useNavigate();
@@ -10,6 +13,8 @@ export default function Registro() {
   const canvasRef = useRef(null);
   const audioRef = useRef(null);
   const particles = useRef([]);
+  const [modal, setModal] = useState({ visible: false, mensaje: "", tipo: "" });
+
 
 
 
@@ -77,39 +82,51 @@ export default function Registro() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  
+ /* Registro */
 const handleRegistro = async (e) => {
   e.preventDefault();
 
-  // Muestra en consola los datos (para debugging)
-  console.log("Registro:", username, email, password);
-
-  const API_URL = import.meta.env.VITE_API_URL; // ← Aquí tomamos la variable de entorno
+  const API_URL = import.meta.env.VITE_API_URL;
 
   try {
-    // Enviar datos al backend
     const response = await fetch(`${API_URL}/api/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email, password })
     });
 
-    const data = await response.json();
+    // Manejar caso donde el backend devuelva error 500 sin JSON
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      data = { msg: "Error interno del servidor" };
+    }
 
+    // Si hubo error
     if (!response.ok) {
-      // Si hay error (correo duplicado, etc.)
-      alert(data.msg);
+      setModal({ visible: true, mensaje: data.msg, tipo: "error" });
       return;
     }
 
     // Registro exitoso
-    alert("Usuario registrado correctamente");
-    navigate("/login");
+    setModal({ visible: true, mensaje: "Usuario registrado correctamente", tipo: "exito" });
+
+    // Redirigir a login después de 2 segundos
+    setTimeout(() => {
+      setModal(prev => ({ ...prev, visible: false }));
+      navigate("/login");
+    }, 7000);
+
   } catch (err) {
+    // Error de fetch u otro error inesperado
+    setModal({ visible: true, mensaje: "Error al registrar usuario", tipo: "error" });
     console.error("Error en registro:", err);
-    alert("Error al registrar usuario");
   }
 };
+
+
+
 
 
 
@@ -133,7 +150,7 @@ const handleRegistro = async (e) => {
       <canvas ref={canvasRef} className="wormhole-canvas"></canvas>
 
       <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: "400px" }}>
-        <h1 className="login-title">REGISTRARSE</h1>
+        <h1 className="login-title serpentin-gold-real">REGISTRARSE</h1>
 
         <form className="form-container" onSubmit={handleRegistro}>
           <input
@@ -172,17 +189,64 @@ const handleRegistro = async (e) => {
               }}
             ></i>
           </div>
-          <button type="submit" className="btn-signal">
+          <button type="submit" className="btn-signal serpentin">
             REGISTRARSE
           </button>
         </form>
 
         <div className="form-container" style={{ marginTop: "1rem" }}>
-          <button className="btn-signal" onClick={() => navigate("/login")}>
+          <button className="btn-signal serpentin" onClick={() => navigate("/login")}>
             VOLVER AL LOGIN
           </button>
         </div>
       </div>
+
+      {modal.visible && (
+  <div
+    className="modal-overlay"
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      background: "rgba(0,0,0,0.6)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 1000
+    }}
+    onClick={() => setModal({ ...modal, visible: false })}
+  >
+    <div
+      className="modal-content"
+      style={{
+        background: modal.tipo === "exito" ? "#0f0f5f" : "#5f0f0f",
+        padding: "2rem",
+        borderRadius: "12px",
+        maxWidth: "400px",
+        width: "90%",
+        color: "#fff",
+        textAlign: "center",
+        position: "relative"
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h2>{modal.tipo === "exito" ? "✅ Éxito" : "❌ Error"}</h2>
+      <p>{modal.mensaje}</p>
+      <button
+        className="btn-signal"
+        style={{ marginTop: "1rem" }}
+        onClick={() => setModal({ ...modal, visible: false })}
+      >
+        Cerrar
+      </button>
+    </div>
+  </div>
+)}
+
+
+
     </div>
   );
 }

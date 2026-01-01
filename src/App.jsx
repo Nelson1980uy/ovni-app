@@ -7,8 +7,10 @@ import Registro from "./pages/Registro";
 import Perfil from "./pages/Perfil";
 import Archivo from "./pages/Archivo";
 import Avistamientos from "./pages/Avistamientos";
-
+import UsuariosVer from "./pages/UsuariosVer";
+import UsuarioPublico from "./pages/UsuarioPublico";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import SenalEntrante from "./pages/SenalEntrante";
 
 export default function App() {
   const usuario = localStorage.getItem("usuario_actual");
@@ -19,7 +21,6 @@ export default function App() {
 
       <main style={{ paddingTop: "64px" }}>
         <Routes>
-
           {/* ================= RUTAS PÚBLICAS ================= */}
           <Route
             path="/"
@@ -37,6 +38,15 @@ export default function App() {
           />
 
           {/* ================= RUTAS PRIVADAS ================= */}
+          <Route
+            path="/senal-entrante"
+            element={
+              <ProtectedRoute>
+                <SenalEntrante />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/perfil"
             element={
@@ -64,16 +74,29 @@ export default function App() {
             }
           />
 
+          {/* Usuarios registrados (solo logueados) */}
+          <Route
+            path="/usuarios"
+            element={
+              <ProtectedRoute>
+                <UsuariosVer />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ================= PERFIL PÚBLICO ================= */}
+          <Route path="/usuario/:id" element={<UsuarioPublico />} />
+
           {/* ================= CATCH ALL ================= */}
           <Route
             path="*"
             element={<Navigate to={usuario ? "/perfil" : "/login"} />}
           />
-
         </Routes>
       </main>
     </>
   );
 }
+
 
 
